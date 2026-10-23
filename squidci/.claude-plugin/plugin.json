@@ -1,0 +1,10 @@
+{
+  "name": "squidci",
+  "version": "1.0.0",
+  "description": "Write and change SquidCI pipeline files (.squidci/pipelines.yaml) correctly, against SquidCI's live docs and JSON Schema.",
+  "author": {
+    "name": "SquidCI",
+    "url": "https://squidci.com"
+  },
+  "homepage": "https://squidci.com/docs/with-an-agent/"
+}

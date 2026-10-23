@@ -1,0 +1,17 @@
+{
+  "name": "squidci",
+  "owner": {
+    "name": "SquidCI",
+    "url": "https://squidci.com"
+  },
+  "metadata": {
+    "description": "SquidCI's plugins for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "squidci",
+      "source": "./squidci",
+      "description": "Write and change SquidCI pipeline files (.squidci/pipelines.yaml) correctly, against SquidCI's live docs and JSON Schema."
+    }
+  ]
+}
