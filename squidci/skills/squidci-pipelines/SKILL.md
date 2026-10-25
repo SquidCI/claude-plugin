@@ -6,7 +6,10 @@ description: Use when writing, changing, reviewing or debugging a SquidCI pipeli
 # SquidCI pipeline files
 
 `.squidci/pipelines.yaml` describes what SquidCI builds, tests, publishes and
-deploys for a repository. This skill holds the rules agents most often get
+deploys for a repository — or the `*.yaml` files in `.squidci/pipelines/`,
+read with it as one file, each component and each top-level environment
+declared in only one of them. Editing one of those files reruns only the
+components it declares. This skill holds the rules agents most often get
 wrong; for everything else, read the docs as they are now rather than
 guessing:
 
@@ -75,13 +78,15 @@ Validate the file against the schema:
 ```bash
 curl -fsSL https://squidci.com/schema/pipelines.json -o /tmp/squidci-pipelines.json
 npx --yes ajv-cli@5 validate --spec=draft7 --strict=false \
-  -s /tmp/squidci-pipelines.json -d .squidci/pipelines.yaml
+  -s /tmp/squidci-pipelines.json -d .squidci/pipelines.yaml   # and each file in .squidci/pipelines/
 ```
 
-Then check by hand what a schema cannot: every name in `needs` and `after` is
-a component in the file, neither goes round in a circle, a component is not
+Then check by hand what a schema cannot, across all the files together: no
+component or top-level environment is declared in two files, every deploy
+has environments to go to, every name in `needs` and `after` is
+a component in the files, neither goes round in a circle, a component is not
 in both, schedules' crons and time zones are real, the file makes at most
-50 jobs (a deploy counts once per environment), and every `cdk` step is
+50 jobs together (a deploy counts once per environment), and every `cdk` step is
 where rule 11 allows, with any `profile` among its job's `aws.profiles`. Keep
 `# yaml-language-server: $schema=https://squidci.com/schema/pipelines.json`
 as the file's first line.
