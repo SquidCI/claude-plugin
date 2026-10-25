@@ -35,8 +35,11 @@ guessing:
 5. **Every value is text.** `tag: 1.10` is "1.10". No YAML anchors or aliases.
 6. **A deploy uses its environment's `aws`, wholly** — profiles and region —
    never the component's. A component's `aws` is for its other sections.
-   `deploy` requires a top-level `environments` map; `$SQUIDCI_ENVIRONMENT`
-   names the environment inside the steps.
+   `deploy` needs environments: the top-level `environments` map, or the
+   component's own `environments`, which replace the top-level map wholly
+   for it — its `after` and `soaked.in` name only its own, and its `prod` is
+   another environment than the file's `prod`. `$SQUIDCI_ENVIRONMENT` is the
+   environment's name inside the steps either way.
 7. **`aws.profile` names are target AWS accounts the user configured** on
    their execution plane in the SquidCI app, not AWS CLI profiles on this
    machine. Ask the user for them; do not invent names. `region` sets
