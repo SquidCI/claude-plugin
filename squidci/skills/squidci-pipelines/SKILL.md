@@ -1,6 +1,6 @@
 ---
 name: squidci-pipelines
-description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys, environments, AWS access, or fixing an invalid pipeline or a failed SquidCI job.
+description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys (AWS CDK apps included), environments, AWS access, or fixing an invalid pipeline or a failed SquidCI job.
 ---
 
 # SquidCI pipeline files
@@ -14,6 +14,7 @@ guessing:
   its URL plus `.md`)
 - Every setting: https://squidci.com/docs/pipelines/reference.md
 - AWS access: https://squidci.com/docs/pipelines/aws.md
+- Deploying CDK apps: https://squidci.com/docs/pipelines/cdk.md
 - JSON Schema: https://squidci.com/schema/pipelines.json
 
 ## Rules that are easy to get wrong
@@ -24,7 +25,7 @@ guessing:
    `uses:`, `with:`, `name:` or `on:` keys. Any key SquidCI does not know
    makes the file invalid, and an invalid file runs nothing.
 2. **A step is a command string, or a map with exactly one key**: `pnpm`,
-   `script` or `docker`. Not `{run: make}` and not `{name: …, run: …}`.
+   `script`, `docker` or `cdk`. Not `{run: make}` and not `{name: …, run: …}`.
 3. **Commands share one bash shell** with `set -eo pipefail`, in the
    component's `base`: a `cd` or `export` carries on to later steps. A
    `script` step runs in its own process and does not.
@@ -50,6 +51,19 @@ guessing:
    or `deploy`.
 10. **`runner.lambda`** components have no shell, checkout, Docker or `pnpm`:
     commands and `script` steps are TypeScript or JavaScript modules.
+11. **Deploy a CDK app with a `cdk:` step, not `pnpm: cdk deploy`**, unless
+    the user wants the command: SquidCI then waits for CloudFormation instead
+    of the job. In `deploy` or `run` it is the **last** step and the job's
+    only `cdk` step, after the app's own build. In `publish` it deploys
+    nothing: it publishes and records stacks, as many steps as the app needs,
+    and a deploy whose **only** step is `cdk: {from: publish, stacks: [...]}`
+    deploys what was recorded. Never in `check`, `test` or `build` (use
+    `cdk synth` as a command there). Stacks in several accounts publish from
+    a step each, with `profile:` naming one of the component's
+    `aws.profiles`; `from: publish` takes no `dir`, `context` or `profile`.
+    Settings are `dir`, `stacks`, `context`, `profile`, `from`, `parameters`,
+    `timeout` (`90m`, `2h`) and `rollback`; read the CDK page before writing
+    one.
 
 ## Before you finish
 
@@ -63,7 +77,8 @@ npx --yes ajv-cli@5 validate --spec=draft7 --strict=false \
 
 Then check by hand what a schema cannot: every name in `needs` and `after` is
 a component in the file, neither goes round in a circle, a component is not
-in both, schedules' crons and time zones are real, and the file makes at most
-50 jobs (a deploy counts once per environment). Keep
+in both, schedules' crons and time zones are real, the file makes at most
+50 jobs (a deploy counts once per environment), and every `cdk` step is
+where rule 11 allows, with any `profile` among its job's `aws.profiles`. Keep
 `# yaml-language-server: $schema=https://squidci.com/schema/pipelines.json`
 as the file's first line.
