@@ -1,6 +1,6 @@
 ---
 name: squidci-pipelines
-description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys (AWS CDK apps included), environments, AWS access, or fixing an invalid pipeline or a failed SquidCI job.
+description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys (AWS CDK apps included), environments, AWS access, or fixing an invalid pipeline or a failed SquidCI job, whose run and log SquidCI's MCP tools read.
 ---
 
 # SquidCI pipeline files
@@ -75,6 +75,25 @@ guessing:
     Settings are `dir`, `stacks`, `context`, `profile`, `from`, `parameters`,
     `timeout` (`90m`, `2h`) and `rollback`; read the CDK page before writing
     one.
+
+## SquidCI's tools, when they are connected
+
+The plugin lists SquidCI's MCP server, `squidci-eu-west-2`; its tools load
+once the user has signed in to it with `/mcp`. All of them only read. When
+they are there, look rather than guess:
+
+- **Before finishing a change to the files**, pass every pipeline file to
+  `validate_pipeline_file`: it reads them as SquidCI will, including what the
+  schema cannot check.
+- **After a push**, find its run with `list_runs` (by repository and branch;
+  repository ids from `list_repositories`) and read it with `get_run`.
+- **When a job failed**, read its log with `get_job_log` — the `jobId` is the
+  job's `assignment.jobId` in `get_run` — before proposing a fix.
+- **What is deployed where**: `list_environments` for now, `list_deployments`
+  for an environment's history, `list_versions` for a version's, and
+  `diff_environment` for what a promotion would bring.
+
+Without them, ask the user for the run's log rather than guessing at it.
 
 ## Before you finish
 

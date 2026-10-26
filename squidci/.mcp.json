@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "squidci-eu-west-2": {
+      "type": "http",
+      "url": "https://api.eu-west-2.squidci.cloud/mcp"
+    }
+  }
+}
