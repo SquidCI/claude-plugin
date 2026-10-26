@@ -38,9 +38,11 @@ guessing:
 4. **`pnpm:` steps set up Node and install the lockfile themselves** (from
    `.nvmrc` or `.node-version`). Do not add `pnpm install`, `nvm use` or a
    Node setup step before them.
-5. **Every value is text.** `tag: 1.10` is "1.10". No YAML anchors or aliases.
+5. **Every value is text.** `tag: 1.10` is "1.10". Anchors and aliases work
+   within one file; merge keys (`<<:`) do not.
 6. **A deploy uses its environment's `aws`, wholly** — profiles and region —
-   never the component's. A component's `aws` is for its other sections.
+   never the component's, and a `deploy` section cannot name `aws` itself.
+   A component's `aws` is for its other sections, unless one names its own.
    `deploy` needs environments: the top-level `environments` map, or the
    component's own `environments`, which replace the top-level map wholly
    for it — its `after` and `soaked.in` name only its own, and its `prod` is
@@ -54,7 +56,8 @@ guessing:
    Artifacts come only from a component's `build` section, listed under
    `artifacts`, and arrive in a needing job at
    `.squidci/artifacts/<component>/<path>`. Values are `name=value` lines
-   appended to `$SQUIDCI_OUTPUT`, read as `$SQUIDCI_<COMPONENT>_<NAME>`.
+   appended to `$SQUIDCI_OUTPUT`, read as
+   `$SQUIDCI_EXPORT_<COMPONENT>_<NAME>`.
    Artifacts and staged images are kept **90 days**, which is why a version
    can be deployed, or rolled back to, for 89 days after its push and no
    longer. They are build output, not storage: anything to keep longer — a
@@ -63,7 +66,7 @@ guessing:
 9. **Pull requests run `check`, `test` and `build` only, with no AWS
    access.** Anything needing AWS or credentials belongs in `publish`, `run`
    or `deploy`.
-10. **`runner.lambda`** components have no shell, checkout, Docker or `pnpm`:
+10. **`runner.lambda`** jobs have no shell, checkout, Docker or `pnpm`:
     commands and `script` steps are TypeScript or JavaScript modules.
 11. **Deploy a CDK app with a `cdk:` step, not `pnpm: cdk deploy`**, unless
     the user wants the command: SquidCI then waits for CloudFormation instead
@@ -114,6 +117,9 @@ has environments to go to, every name in `needs` and `after` is
 a component in the files, neither goes round in a circle, a component is not
 in both, schedules' crons and time zones are real, the file makes at most
 50 jobs together (a deploy counts once per environment), and every `cdk` step is
-where rule 11 allows, with any `profile` among its job's `aws.profiles`. Keep
+where rule 11 allows, with any `profile` among its job's `aws.profiles`, and
+no Lambda job — a section whose runner, merged over its component's, has
+`lambda` — inherits the component's `services` or `test-reports`, or is the
+`build`, `publish`, `run` or `deploy` of a component with `artifacts`. Keep
 `# yaml-language-server: $schema=https://squidci.com/schema/pipelines.json`
 as the file's first line.
