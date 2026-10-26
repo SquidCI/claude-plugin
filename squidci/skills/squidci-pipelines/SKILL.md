@@ -52,6 +52,11 @@ guessing:
    `artifacts`, and arrive in a needing job at
    `.squidci/artifacts/<component>/<path>`. Values are `name=value` lines
    appended to `$SQUIDCI_OUTPUT`, read as `$SQUIDCI_<COMPONENT>_<NAME>`.
+   Artifacts and staged images are kept **90 days**, which is why a version
+   can be deployed, or rolled back to, for 89 days after its push and no
+   longer. They are build output, not storage: anything to keep longer — a
+   release binary, an image that runs — is pushed somewhere of the user's
+   own in `publish`.
 9. **Pull requests run `check`, `test` and `build` only, with no AWS
    access.** Anything needing AWS or credentials belongs in `publish`, `run`
    or `deploy`.
