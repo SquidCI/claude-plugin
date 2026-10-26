@@ -1,7 +1,7 @@
 {
   "name": "squidci",
-  "version": "1.4.0",
-  "description": "Write and change SquidCI pipeline files (.squidci/pipelines.yaml) correctly, against SquidCI's live docs and JSON Schema; and read your SquidCI runs, logs, environments, versions and deployments.",
+  "version": "1.5.0",
+  "description": "Write and change SquidCI pipeline files (.squidci/pipelines.yaml) correctly, against SquidCI's live docs and JSON Schema; and read your SquidCI runs, logs, job usage, environments, versions and deployments.",
   "author": {
     "name": "SquidCI",
     "url": "https://squidci.com"

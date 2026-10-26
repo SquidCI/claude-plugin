@@ -1,6 +1,6 @@
 ---
 name: squidci-pipelines
-description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys (AWS CDK apps included), environments, AWS access, or fixing an invalid pipeline or a failed SquidCI job, whose run and log SquidCI's MCP tools read.
+description: Use when writing, changing, reviewing or debugging a SquidCI pipeline file, .squidci/pipelines.yaml — adding components, steps, deploys (AWS CDK apps included), environments, AWS access, or fixing an invalid pipeline or a failed, slow or killed SquidCI job, whose run, log and usage SquidCI's MCP tools read.
 ---
 
 # SquidCI pipeline files
@@ -93,8 +93,22 @@ they are there, look rather than guess:
   schema cannot check.
 - **After a push**, find its run with `list_runs` (by repository and branch;
   repository ids from `list_repositories`) and read it with `get_run`.
-- **When a job failed**, read its log with `get_job_log` — the `jobId` is the
-  job's `assignment.jobId` in `get_run` — before proposing a fix.
+- **When a job failed**, read it with `get_job` and its log with
+  `get_job_log` — the `jobId` is the job's `assignment.jobId` in `get_run` —
+  before proposing a fix. `get_job`'s `result` has its failing tests, where
+  its time went, and what it used against its `limits`.
+- **When a job was killed or slow**, check memory before the code. Exit code
+  137, a daemon "unexpectedly lost", or tests failing oddly after a stall
+  usually mean the kernel killed a process for want of memory: `get_job`'s
+  `result.usage.oomKills` above 0, or `memoryBytes.max` near
+  `limits.memoryBytes`, confirms it. `get_job_usage` shows CPU, memory, disk
+  and stalls over time. The fixes, cheapest first: cap the tools' heaps
+  (`org.gradle.jvmargs`, `kotlin.daemon.jvmargs`, a test task's
+  `maxHeapSize`, Node's `--max-old-space-size`), run on a worker group with
+  more memory per vCPU, or raise `runner.vcpus`, which brings memory in
+  proportion. CPU at the reservation for long stretches means more vCPUs
+  will help; well below it, they will not. See
+  https://squidci.com/docs/concepts/job-performance/.
 - **What is deployed where**: `list_environments` for now, `list_deployments`
   for an environment's history, `list_versions` for a version's, and
   `diff_environment` for what a promotion would bring.

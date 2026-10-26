@@ -3,7 +3,7 @@
 A Claude Code plugin marketplace with one plugin, `squidci`: a skill for
 writing and changing SquidCI pipeline files, `.squidci/pipelines.yaml`, and
 SquidCI's MCP server, whose read-only tools show an agent the organization's
-runs, logs, environments, versions and deployments.
+runs, logs, job usage, environments, versions and deployments.
 
 ```text
 /plugin marketplace add SquidCI/claude-plugin
