@@ -23,9 +23,12 @@ guessing:
 ## Rules that are easy to get wrong
 
 1. **It is not GitHub Actions.** The file is a map of components; each has
-   steps under sections — `check`, `test`, `build`, `publish`, `run`,
-   `deploy` — and **each section is one job**. There are no `jobs:`, `steps:`,
-   `uses:`, `with:`, `name:` or `on:` keys. Any key SquidCI does not know
+   sections — `check`, `test`, `build`, `publish`, `run`, `deploy` — and
+   **each section is one job**, a map with its `steps:` list. A section may
+   also name its own `runner`, `services`, `aws`, `cache` or `test-reports`,
+   over the component's; nothing else. There are no `jobs:`, `uses:`,
+   `with:`, `name:` or `on:` keys, and a section that is a bare list of steps
+   is refused. Any key SquidCI does not know
    makes the file invalid, and an invalid file runs nothing.
 2. **A step is a command string, or a map with exactly one key**: `pnpm`,
    `script`, `docker` or `cdk`. Not `{run: make}` and not `{name: …, run: …}`.
