@@ -96,7 +96,10 @@ they are there, look rather than guess:
 - **When a job failed**, read it with `get_job` and its log with
   `get_job_log` — the `jobId` is the job's `assignment.jobId` in `get_run` —
   before proposing a fix. `get_job`'s `result` has its failing tests, where
-  its time went, and what it used against its `limits`.
+  its time went, and what it used against its `limits`. `get_job_tests`
+  names every test the job ran, by class or file — read it rather than
+  guessing from the log which tests ran, or where a split's shard spent its
+  time.
 - **When a job was killed or slow**, check memory before the code. Exit code
   137, a daemon "unexpectedly lost", or tests failing oddly after a stall
   usually mean the kernel killed a process for want of memory: `get_job`'s
