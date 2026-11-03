@@ -31,13 +31,17 @@ guessing:
    is refused. Any key SquidCI does not know
    makes the file invalid, and an invalid file runs nothing.
 2. **A step is a command string, or a map with exactly one key**: `pnpm`,
-   `script`, `docker` or `cdk`. Not `{run: make}` and not `{name: …, run: …}`.
+   `uv`, `gradle`, `script`, `docker`, `cdk` or `webhook`. Not `{run: make}`
+   and not `{name: …, run: …}`.
 3. **Commands share one bash shell** with `set -eo pipefail`, in the
    component's `base`: a `cd` or `export` carries on to later steps. A
    `script` step runs in its own process and does not.
 4. **`pnpm:` steps set up Node and install the lockfile themselves** (from
    `.nvmrc` or `.node-version`). Do not add `pnpm install`, `nvm use` or a
-   Node setup step before them.
+   Node setup step before them. **`uv:` steps sync the lockfile themselves**
+   (`uv sync --locked`, installing the Python the project pins): do not add
+   `uv sync` or `uv python install` before them, and write `uv: run pytest`
+   rather than the command `uv run pytest`, so the job is set up for it.
 5. **Every value is text.** `tag: 1.10` is "1.10". Anchors and aliases work
    within one file; merge keys (`<<:`) do not.
 6. **A deploy uses its environment's `aws`, wholly** — profiles and region —
@@ -66,7 +70,7 @@ guessing:
 9. **Pull requests run `check`, `test` and `build` only, with no AWS
    access.** Anything needing AWS or credentials belongs in `publish`, `run`
    or `deploy`.
-10. **`runner.lambda`** jobs have no shell, checkout, Docker or `pnpm`:
+10. **`runner.lambda`** jobs have no shell, checkout, Docker, `pnpm` or `uv`:
     commands and `script` steps are TypeScript or JavaScript modules.
 11. **Deploy a CDK app with a `cdk:` step, not `pnpm: cdk deploy`**, unless
     the user wants the command: SquidCI then waits for CloudFormation instead
