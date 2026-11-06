@@ -71,7 +71,8 @@ guessing:
    access.** Anything needing AWS or credentials belongs in `publish`, `run`
    or `deploy`.
 10. **`runner.lambda`** jobs have no shell, checkout, Docker, `pnpm` or `uv`:
-    commands and `script` steps are TypeScript or JavaScript modules.
+    commands and `script` steps are TypeScript or JavaScript modules, and
+    of the recipes only those with a Node module run there (`webhook`).
 11. **Deploy a CDK app with a `cdk:` step, not `pnpm: cdk deploy`**, unless
     the user wants the command: SquidCI then waits for CloudFormation instead
     of the job. In `deploy` or `run` it is the **last** step and the job's
