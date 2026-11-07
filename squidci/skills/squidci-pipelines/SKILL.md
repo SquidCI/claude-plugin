@@ -72,20 +72,20 @@ guessing:
    or `deploy`.
 10. **`runner.lambda`** jobs have no shell, checkout, Docker, `pnpm` or `uv`:
     commands and `script` steps are TypeScript or JavaScript modules, and
-    of the recipes only those with a Node module run there (`webhook`).
-11. **Deploy a CDK app with a `cdk:` step, not `pnpm: cdk deploy`**, unless
-    the user wants the command: SquidCI then waits for CloudFormation instead
-    of the job. In `deploy` or `run` it is the **last** step and the job's
-    only `cdk` step, after the app's own build. In `publish` it deploys
-    nothing: it publishes and records stacks, as many steps as the app needs,
-    and a deploy whose **only** step is `cdk: {from: publish, stacks: [...]}`
-    deploys what was recorded. Never in `check`, `test` or `build` (use
-    `cdk synth` as a command there). Stacks in several accounts publish from
-    a step each, with `profile:` naming one of the component's
-    `aws.profiles`; `from: publish` takes no `dir`, `context` or `profile`.
-    Settings are `dir`, `stacks`, `context`, `profile`, `from`, `parameters`,
-    `timeout` (`90m`, `2h`) and `rollback`; read the CDK page before writing
-    one.
+    of the recipes only those with a Node module run there (`webhook`,
+    `cdk`).
+11. **Deploy a CDK app with the `cdk` recipe.** `cdk: {command: <cmd>, …}`
+    runs one CDK command for the app in `dir` (from the repository's root).
+    On EC2 it is the CLI, any command, `deploy` waiting in the job (add
+    `args: --require-approval never` for a deploy that adds IAM). To deploy
+    without holding a worker, publish once and deploy on Lambda: in
+    `publish`, `cdk: {command: publish, stacks: [...]}` — a step per
+    account, with `profile:` naming one of the component's `aws.profiles` —
+    and a `deploy` section with `runner: {lambda: nodejs26.x}` whose step is
+    `cdk: {command: deploy, stacks: [web-$SQUIDCI_ENVIRONMENT]}`. On Lambda
+    only `deploy`, `diff` and `destroy` are allowed, and a Lambda job lasts
+    at most 15 minutes: a longer deploy belongs on EC2. Read the CDK page
+    before writing one.
 
 ## SquidCI's tools, when they are connected
 
@@ -138,9 +138,8 @@ component or top-level environment is declared in two files, every deploy
 has environments to go to, every name in `needs` and `after` is
 a component in the files, neither goes round in a circle, a component is not
 in both, schedules' crons and time zones are real, the file makes at most
-50 jobs together (a deploy counts once per environment), and every `cdk` step is
-where rule 11 allows, with any `profile` among its job's `aws.profiles`, and
-no Lambda job — a section whose runner, merged over its component's, has
+50 jobs together (a deploy counts once per environment), a `cdk` step on
+Lambda runs only `deploy`, `diff` or `destroy`, and no Lambda job — a section whose runner, merged over its component's, has
 `lambda` — inherits the component's `services` or `test-reports`, or is the
 `build`, `publish`, `run` or `deploy` of a component with `artifacts`. Keep
 `# yaml-language-server: $schema=https://squidci.com/schema/pipelines.json`
