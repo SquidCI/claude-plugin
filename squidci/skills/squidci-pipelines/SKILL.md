@@ -78,14 +78,14 @@ guessing:
     runs one CDK command for the app in `dir` (from the repository's root).
     On EC2 it is the CLI, any command, `deploy` waiting in the job (add
     `args: --require-approval never` for a deploy that adds IAM). To deploy
-    without holding a worker, publish once and deploy on Lambda: in
-    `publish`, `cdk: {command: publish, stacks: [...]}` — a step per
-    account, with `profile:` naming one of the component's `aws.profiles` —
-    and a `deploy` section with `runner: {lambda: nodejs26.x}` whose step is
-    `cdk: {command: deploy, stacks: [web-$SQUIDCI_ENVIRONMENT]}`. On Lambda
-    only `deploy`, `diff` and `destroy` are allowed, and a Lambda job lasts
-    at most 15 minutes: a longer deploy belongs on EC2. Read the CDK page
-    before writing one.
+    without holding a worker, publish once and hand the deploy to the
+    `cdk-deploy` workflow: in `publish`, `cdk: {command: publish, stacks:
+    [...]}` — a step per account, with `profile:` naming one of the
+    component's `aws.profiles` — and a `deploy` section with
+    `runner: {workflow: cdk-deploy}` and `with: {stacks:
+    [web-$SQUIDCI_ENVIRONMENT]}`, no steps. It deploys what the version
+    published, in dependency order, for up to a day, and exports each
+    stack's outputs. Read the CDK page before writing one.
 
 ## SquidCI's tools, when they are connected
 
