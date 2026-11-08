@@ -22,7 +22,9 @@ guessing:
 
 ## Rules that are easy to get wrong
 
-1. **It is not GitHub Actions.** The file is a map of components; each has
+1. **It is not GitHub Actions.** The file's top holds only `components`,
+   `environments`, `secrets`, `notifications` and `use`; every component goes
+   under `components:`, by name, and a component at the top is refused. Each has
    sections — `check`, `test`, `build`, `publish`, `run`, `deploy` — and
    **each section is one job**, a map with its `steps:` list. A section may
    also name its own `runner`, `services`, `aws`, `cache` or `test-reports`,
