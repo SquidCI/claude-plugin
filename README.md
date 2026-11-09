@@ -1,5 +1,16 @@
 # SquidCI for Claude Code
 
+> **Deprecated.** SquidCI's MCP server now teaches an agent everything this
+> plugin did — the pipeline file's rules, its tools, starting runs — and
+> reaches every client, Claude Managed Agents included. Uninstall the plugin
+> with `/plugin uninstall squidci@squidci`, then connect the server directly:
+>
+> ```bash
+> claude mcp add --transport http squidci-eu-west-2 https://api.eu-west-2.squidci.cloud/mcp
+> ```
+>
+> See https://squidci.com/docs/mcp/.
+
 A Claude Code plugin marketplace with one plugin, `squidci`: a skill for
 writing and changing SquidCI pipeline files, `.squidci/pipelines.yaml`, and
 SquidCI's MCP server, whose read-only tools show an agent the organization's

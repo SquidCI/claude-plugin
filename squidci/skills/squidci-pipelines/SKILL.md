@@ -5,6 +5,9 @@ description: Use when writing, changing, reviewing or debugging a SquidCI pipeli
 
 # SquidCI pipeline files
 
+> Deprecated: SquidCI's MCP server carries these rules, kept current, in
+> `get_pipeline_guide`. Prefer it when it is connected.
+
 `.squidci/pipelines.yaml` describes what SquidCI builds, tests, publishes and
 deploys for a repository — or the `*.yaml` files in `.squidci/pipelines/`,
 read with it as one file, each component and each top-level environment
